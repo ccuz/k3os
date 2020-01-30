@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: metallb-system
+  labels:
+    name: metallb-system
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: metallb
+  namespace: kube-system
+spec:
+  chart: stable/metallb
+  version: 0.8.3
+  targetNamespace: metallb-system
+  helmVersion: v3.0+unreleased
+  set:
+    rbac.enabled: "true"
+    ssl.enabled: "true"
+    metrics.prometheus.enabled: "true"
+    kubernetes.ingressEndpoint.useDefaultPublishedService: "true"
+--
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+ config: |
+   address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 192.168.1.240-192.168.1.250

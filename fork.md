@@ -5,7 +5,9 @@ This fork of the upstream k3OS add as default
 - Helm 3 (without Tiller) with RBAC to support Helm-Chart package deployments
 - Preconfigure using response/config-file within the iso
 
-Please see [k3OS README](README.md) for installation 
+Please see [k3OS README](README.md) for [installation](https://ahmermansoor.blogspot.com/2019/05/install-lightweight-kubernetes-k3s-with-k3os.html):
+- After boot the live ISO, login with user "rancher" (no password)
+- Do "sudo passwd rancher" to set a default password
 
 Readings
 - [Deploy k3os and openebs](https://medium.com/@fromprasath/deploy-k3s-cluster-on-k3os-and-use-openebs-as-persistent-storage-provisioner-3db229c0acf8)
@@ -19,8 +21,9 @@ At runtime, the config can be changed by creating/modifying the ```/var/lib/ranc
 All Kubernetes configuration is done by configuring k3s. This is primarily done through environment and k3s_args keys in config.yaml.
 Default Environment variable can be added by modifying [environment variable](overlay/etc/environment).
 The write_files key can be used to populate the /var/lib/rancher/k3s/server/manifests folder with apps you'd like to deploy on boot.
-Any file found in /var/lib/rancher/k3s/server/manifests will automatically be deployed to Kubernetes in a manner similar to kubectl apply.
-It is also possible to deploy Helm charts. K3s supports a CRD controller for installing charts. A YAML file specification can look as following (example taken from /var/lib/rancher/k3s/server/manifests/traefik.yaml):
+Any file found in [k3s /var/lib/rancher/k3s/server/manifests](overlay/share/rancher/k3s/server/manifests) will automatically be deployed to Kubernetes in a manner similar to kubectl apply.
+It is also possible to deploy Helm charts. K3s supports a CRD controller for installing charts. 
+See [k3s yaml manifests](https://github.com/rancher/k3s/tree/master/manifests) as examples.
 
 see [k3s advanced options](https://rancher.com/docs/k3s/latest/en/advanced/) for configuring Helm, MetalLB, OpenEBS.
 
