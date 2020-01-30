@@ -5,7 +5,9 @@ This fork of the upstream k3OS add as default
 - Helm 3 (without Tiller) with RBAC to support Helm-Chart package deployments
 - Preconfigure using response/config-file within the iso
 
-Please see [k3OS README](README.md) for installation 
+Please see [k3OS README](README.md) for [installation](https://ahmermansoor.blogspot.com/2019/05/install-lightweight-kubernetes-k3s-with-k3os.html):
+- After boot the live ISO, login with user "rancher" (no password)
+- Do "sudo passwd rancher" to set a default password
 
 Readings
 - [Deploy k3os and openebs](https://medium.com/@fromprasath/deploy-k3s-cluster-on-k3os-and-use-openebs-as-persistent-storage-provisioner-3db229c0acf8)
