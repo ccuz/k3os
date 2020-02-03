@@ -13,6 +13,54 @@ Readings
 - [Deploy k3os and openebs](https://medium.com/@fromprasath/deploy-k3s-cluster-on-k3os-and-use-openebs-as-persistent-storage-provisioner-3db229c0acf8)
 - [K3OS with MetalLB and Dashboad](https://mindmelt.nl/mindmelt.nl/2019/04/08/k3s-kubernetes-dashboard-load-balancer/)
 
+# Connect to K8s api
+Connect to your master-node using ssh.
+- Check the cluster 
+```
+myhostname [~]$ kubectl get nodes
+NAME         STATUS   ROLES    AGE   VERSION
+myhostname   Ready    master   11m   v1.17.2+k3s1
+```
+
+- Type 
+```
+myhostname [~]$ kubectl config view --minify
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority-data: ...
+              server: https://127.0.0.1:6443
+            name: default
+         ...
+          users:
+          - name: default
+            user:
+              password: 3289efrnke472ljf
+              username: admin
+```
+- Connect using your browser ```https://ip-of-the-master-node:6443``` and ```user: admin, password: 3289efrnke472ljf``` to the K8s master-api
+- List the kubernetes resources ```kubectl get svc,deployments,pods,ingresses -n kube-system``` or endpoints ```kubectl get endpoints -n kube-system```
+- Get K8s cluster infos: 
+```
+CLUSTER_ENDPOINT=$(kubectl config view --raw -o json | jq -r '.clusters[] | select(.name == "'$(kubectl config current-context)'") | .cluster."server"')
+CLUSTER_CA=$(kubectl config view --raw -o json | jq -r '.clusters[] | select(.name == "'$(kubectl config current-context)'") | .cluster."certificate-authority-data"')
+CLIENT_CERTIFICATE_DATA=$(kubectl get csr mycsr -n kube-system -o jsonpath='{.status.certificate}')
+CLUSTER_NAME=$(kubectl config view --minify -o jsonpath={.current-context})
+ADMINUSER_TOKEN=$(kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}'))
+echo $ADMINUSER_TOKEN | base64 -d > ./k3s_token
+echo $CLUSTER_CA | base64 -d > ./k3s_ca
+```
+- Copy file ```k3s_token``` and ```k3s_ca``` using scp to your local computer 
+- From within your local computer, add the cluster to your local kubectl client: 
+```
+kubectl config set-cluster myk3scluster --server=https://ip-of-the-master-node:6443 --certificate-authority="$(pwd)/k3s_ca"
+kubectl config set-credentials service-user --token="$(cat ./k3s_token)"
+kubectl config set-context k3oscluster --cluster=myk3scluster --user=service-user
+kubectl config use-context k3oscluster
+```
+
+Getting the [K8s dashboard](https://www.thebookofjoel.com/cheap-production-k3s-with-dashboard-ui) running
+
 # Preconfigure k3OS config.yaml
 The ```/k3os/system/config.yaml``` file is reserved for the system installation and should not be modified on a running system.
 At runtime, the config can be changed by creating/modifying the ```/var/lib/rancher/k3os/config.yaml``` and ```/var/lib/rancher/k3os/config.d/*```

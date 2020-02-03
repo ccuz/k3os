@@ -11,7 +11,7 @@ metadata:
   name: kubernetes-dashboard
   namespace: kube-system
 spec:
-  chart: https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-rc2/aio/deploy/recommended.yaml
+  chart: https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended.yaml
   targetNamespace: kubernetes-dashboard
   helmVersion: v3.0+unreleased
   set:
@@ -19,3 +19,22 @@ spec:
     ssl.enabled: "true"
     metrics.prometheus.enabled: "true"
     kubernetes.ingressEndpoint.useDefaultPublishedService: "true"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin-user
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-user
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: admin-user
+    namespace: kube-system
