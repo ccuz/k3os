@@ -40,6 +40,7 @@ myhostname [~]$ kubectl config view --minify
 ```
 - Connect using your browser ```https://ip-of-the-master-node:6443``` and ```user: admin, password: 3289efrnke472ljf``` to the K8s master-api
 - List the kubernetes resources ```kubectl get svc,deployments,pods,ingresses -n kube-system``` or endpoints ```kubectl get endpoints -n kube-system```
+- Read the logs of K3s ```sudo more /var/log/k3s-service.log```
 - Get K8s cluster infos: 
 ```
 CLUSTER_ENDPOINT=$(kubectl config view --raw -o json | jq -r '.clusters[] | select(.name == "'$(kubectl config current-context)'") | .cluster."server"')
@@ -54,12 +55,46 @@ echo $CLUSTER_CA | base64 -d > ./k3s_ca
 - From within your local computer, add the cluster to your local kubectl client: 
 ```
 kubectl config set-cluster myk3scluster --server=https://ip-of-the-master-node:6443 --certificate-authority="$(pwd)/k3s_ca"
+or 
+kubectl config set-cluster myk3scluster --server=https://ip-of-the-master-node:6443 --insecure-skip-tls-verify=true
 kubectl config set-credentials service-user --token="$(cat ./k3s_token)"
 kubectl config set-context k3oscluster --cluster=myk3scluster --user=service-user
 kubectl config use-context k3oscluster
+kubectl config view
 ```
+- Start a proxy to the remote cluster
+```
+$ kubectl proxy --port=8002
+```
+- Open the Api in your local browser at ```http://localhost:8002/api/```.
+- Install the latest version of the kubernete dashboard using helm (Download helm client at https://github.com/helm/helm/releases). Note: With Helm 3 you now have to use the form ```helm [command] [name] [chart]```
+```
+$ helm --kube-context k3oscluster repo add stable https://kubernetes-charts.storage.googleapis.com/
+$ helm --kube-context k3oscluster list
+$ helm --kube-context k3oscluster repo update
+$ helm --kube-context k3oscluster install dashboard-demo stable/kubernetes-dashboard
+NAME: dashboard-demo
+LAST DEPLOYED: Mon Feb 10 17:35:07 2020
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+*********************************************************************************
+*** PLEASE BE PATIENT: kubernetes-dashboard may take a few minutes to install ***
+*********************************************************************************
 
-Getting the [K8s dashboard](https://www.thebookofjoel.com/cheap-production-k3s-with-dashboard-ui) running
+Get the Kubernetes Dashboard URL by running:
+  export POD_NAME=$(kubectl get pods -n default -l "app=kubernetes-dashboard,release=dashboard-demo" -o jsonpath="{.items[0].metadata.name}")
+  echo https://127.0.0.1:8443/
+  kubectl -n default port-forward $POD_NAME 8443:8443
+$ helm upgrade dashboard-demo stable/kubernetes-dashboard --set fullnameOverride="dashboard"
+$ kubectl get services
+```
+- Check the dashboard at ```http://localhost:8002/api/v1/namespaces/default/services/https:dashboard:https/proxy/```
+- Delete the dashboard afterwards ```helm delete dashboard-demo```
+
+Getting the [K8s dashboard](https://www.thebookofjoel.com/cheap-production-k3s-with-dashboard-ui) running with it's [own namespace](https://akomljen.com/installing-kubernetes-dashboard-per-namespace/)
 
 # Preconfigure k3OS config.yaml
 The ```/k3os/system/config.yaml``` file is reserved for the system installation and should not be modified on a running system.
