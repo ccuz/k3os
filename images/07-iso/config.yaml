@@ -6,23 +6,22 @@ ssh_authorized_keys:
   - github:ccuz
 hostname: myhostname
 write_files:
-  - encoding: ""
-      content: |-
-        apiVersion: v1
-        kind: ConfigMap
-        metadata:
-          namespace: metallb-system
-          name: metallb-config
-        data:
-         config: |
-           address-pools:
+  - content: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        namespace: metallb-system
+        name: metallb-config
+      data:
+        config: |
+          address-pools:
             - name: default
               protocol: layer2
               addresses:
-              - 192.168.1.240-192.168.1.250
-      owner: root
-      path: /var/lib/rancher/k3s/server/manifests/metallb-config.yaml
-      permissions: '0600'
+            - 192.168.1.240-192.168.1.250
+    owner: root
+    path: /var/lib/rancher/k3s/server/manifests/metallb-config.yaml
+    permissions: '0600'
 k3os:
   modules:
     - kvm
