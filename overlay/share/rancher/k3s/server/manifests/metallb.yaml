@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -14,7 +15,6 @@ spec:
   chart: stable/metallb
   version: 0.8.3
   targetNamespace: metallb-system
-  helmVersion: v3.0+unreleased
   set:
     rbac.enabled: "true"
     ssl.enabled: "true"

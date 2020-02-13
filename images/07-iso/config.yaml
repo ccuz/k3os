@@ -16,4 +16,4 @@ k3os:
     - 0.us.pool.ntp.org
     - 1.us.pool.ntp.org
   # Use "sudo passwd rancher" after first login to set a password
-  password: rancher
+  password: ""
