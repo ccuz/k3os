@@ -6,8 +6,11 @@ metadata:
   namespace: kube-system
 spec:
   chart: stable/traefik
+  targetNamespace: kube-system
   helmVersion: v3.0+unreleased
   set:
+    ports.web.port: 80
+    ports.websecure.port: 443
     rbac.enabled: "true"
     ssl.enabled: "true"
     metrics.prometheus.enabled: "true"

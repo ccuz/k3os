@@ -11,25 +11,13 @@ kind: HelmChart
 metadata:
   name: metallb
   namespace: kube-system
+  #https://github.com/helm/charts/tree/master/stable/metallb
 spec:
   chart: stable/metallb
-  version: 0.8.3
   targetNamespace: metallb-system
   set:
+    rbac.create: "true"
     rbac.enabled: "true"
     ssl.enabled: "true"
     metrics.prometheus.enabled: "true"
     kubernetes.ingressEndpoint.useDefaultPublishedService: "true"
---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  namespace: metallb-system
-  name: config
-data:
- config: |
-   address-pools:
-    - name: default
-      protocol: layer2
-      addresses:
-      - 192.168.1.240-192.168.1.250
