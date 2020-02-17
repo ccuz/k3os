@@ -36,4 +36,4 @@ k3os:
   password: ""
   k3s_args:
     - server
-    - "--no-deploy=traefik"
+    - "--no-deploy=traefik,servicelb"
